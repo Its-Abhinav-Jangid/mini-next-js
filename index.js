@@ -32,7 +32,6 @@ export async function streamReactFileToClient(filePath, response) {
         response.setHeader("content-type", mime[".html"]);
         pipe(response);
       },
-      // bootstrapScripts: ["/static/scripts/client.js"],
     }
   );
 
@@ -49,11 +48,6 @@ export async function getRoutes(dir = PAGES_FOLDER) {
     if (name === "layout") continue;
     routes[name === "index" ? "/" : `/${name}`] = { fileName: file };
   }
-  console.log(routes);
-
-  // 404 mapping if it exists
-
-  // routes["/not-found"] = { fileName: "not-found.html" };
 
   return routes;
 }
@@ -64,7 +58,6 @@ function getMimeType(fileName) {
 
 export async function startServer(dir = PAGES_FOLDER) {
   if (dir) PAGES_FOLDER = dir;
-  // console.log(PAGES_FOLDER);
 
   const routes = await getRoutes(dir);
 
@@ -76,7 +69,6 @@ export async function startServer(dir = PAGES_FOLDER) {
     const fileName = route?.fileName;
     res.statusCode = 200;
     if (path.startsWith("/scripts")) {
-      // adjust path prefix as needed
       const filePath = join(".previous", ...path.split("/").slice(2)); // map URL path to local files
       try {
         const fileStat = await stat(filePath);
@@ -106,8 +98,6 @@ export async function startServer(dir = PAGES_FOLDER) {
     } else {
       try {
         if (fileName) {
-          console.log("PAGESFOLDER: ", join(PAGES_FOLDER, fileName));
-
           const filePath = join(PAGES_FOLDER, fileName);
           await streamReactFileToClient(filePath, res);
 
