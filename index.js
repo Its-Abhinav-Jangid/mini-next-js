@@ -7,7 +7,7 @@ import React from "react";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const PUBLIC_DIR = path.join(__dirname, "/frontend/public");
+let PUBLIC_DIR = path.join(__dirname, "/frontend/static");
 let PORT = 3000;
 let PAGES_FOLDER = path.join(__dirname, "/.previous/pages");
 
@@ -32,7 +32,7 @@ export async function streamReactFileToClient(filePath, response) {
         response.setHeader("content-type", mime[".html"]);
         pipe(response);
       },
-      // bootstrapScripts: ["/scripts/client.js"],
+      // bootstrapScripts: ["/static/scripts/client.js"],
     }
   );
 
@@ -49,10 +49,11 @@ export async function getRoutes(dir = PAGES_FOLDER) {
     if (name === "layout") continue;
     routes[name === "index" ? "/" : `/${name}`] = { fileName: file };
   }
+  console.log(routes);
 
   // 404 mapping if it exists
 
-  routes["/not-found"] = { fileName: "not-found.html" };
+  // routes["/not-found"] = { fileName: "not-found.html" };
 
   return routes;
 }
@@ -74,8 +75,24 @@ export async function startServer(dir = PAGES_FOLDER) {
     const route = routes[path];
     const fileName = route?.fileName;
     res.statusCode = 200;
-
-    if (path.startsWith("/static")) {
+    if (path.startsWith("/scripts")) {
+      // adjust path prefix as needed
+      const filePath = join(".previous", ...path.split("/").slice(2)); // map URL path to local files
+      try {
+        const fileStat = await stat(filePath);
+        if (fileStat.isFile()) {
+          const content = await readFile(filePath);
+          res.writeHead(200, {
+            "Content-Type": getMimeType(filePath) || "application/javascript",
+          });
+          res.end(content);
+          return;
+        }
+      } catch (err) {
+        res.statusCode = 404;
+        res.end();
+      }
+    } else if (path.startsWith("/static")) {
       const filePath = join(PUBLIC_DIR, decodeURIComponent(req.url));
       const fileStat = await stat(filePath);
       if (fileStat.isFile()) {
@@ -98,10 +115,11 @@ export async function startServer(dir = PAGES_FOLDER) {
         } else {
           res.statusCode = 404;
           if (routes["/not-found"]) {
-            const nf = routes["/not-found"].fileName;
-            const html = await readFile(join(PAGES_FOLDER, nf));
-            res.setHeader("Content-Type", getMimeType(nf));
-            res.end(html);
+            const filePath = join(PAGES_FOLDER, routes["/not-found"].fileName);
+
+            await streamReactFileToClient(filePath, res);
+
+            res.end();
           } else {
             res.setHeader("Content-Type", "text/html");
             res.end("<h1>Not found</h1>");
@@ -135,4 +153,7 @@ export async function startServer(dir = PAGES_FOLDER) {
 // Auto-start when run directly (not imported)
 if (process.env.NODE_ENV !== "test") {
   startServer();
+} else {
+  PUBLIC_DIR = path.join(__dirname, "/tests/static");
+  PAGES_FOLDER = path.join(__dirname, "/.previous/tests/pages");
 }

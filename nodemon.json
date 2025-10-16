@@ -1,4 +1,4 @@
 {
-  "watch": ["index.js", "./frontend/pages/**", "./frontend/public/scripts/**"],
-  "ext": ".jsx"
+  "watch": ["index.js", "./frontend/pages/**", "./frontend/static/**"],
+  "ext": ".jsx,.js"
 }

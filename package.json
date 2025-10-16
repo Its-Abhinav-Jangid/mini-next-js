@@ -7,7 +7,8 @@
     "start": "node index.js",
     "dev": "nodemon --exec \"npm run build && node index.js\"",
     "test": "vitest --run",
-    "build": "npx esbuild frontend/pages/*.jsx --outdir=.previous/pages --format=esm"
+    "test-build": "npx esbuild tests/static/scripts/client.js --loader:.js=jsx tests/pages/*.jsx --bundle --outdir=.previous/tests --format=esm --platform=browser --target=esnext --splitting --minify",
+    "build": "npx esbuild frontend/static/scripts/client.js --loader:.js=jsx frontend/pages/*.jsx --bundle --outdir=.previous --format=esm --platform=browser --target=esnext --splitting --minify"
   },
   "keywords": [],
   "author": "",

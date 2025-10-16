@@ -19,7 +19,7 @@ describe("getRoutes function", () => {
     const expected = {
       "/about": { fileName: "about.js" },
       "/": { fileName: "index.js" },
-      "/not-found": { fileName: "not-found.html" },
+      "/not-found": { fileName: "not-found.js" },
     };
 
     const result = await getRoutes();
@@ -33,13 +33,13 @@ describe("Check if server is working", () => {
 
   beforeAll(async () => {
     // Start the dev server
-    serverProcess = spawn("npm", ["run", "build"], {
+    serverProcess = spawn("npm", ["run", "test-build"], {
       shell: true,
       stdio: "inherit", // output logs to console
     });
+    await delay(5000); // adjust if server takes longer
     const server = await startServer();
     // Wait for the server to start
-    await delay(5000); // adjust if server takes longer
   });
 
   afterAll(() => {
