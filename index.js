@@ -8,7 +8,7 @@ import React from "react";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 let PUBLIC_DIR = path.join(__dirname, "/frontend/static");
-let PORT = 3000;
+let PORT = 3001;
 let PAGES_FOLDER = path.join(__dirname, "/.previous/pages");
 
 const mime = {
@@ -70,6 +70,8 @@ export async function startServer(dir = PAGES_FOLDER) {
     res.statusCode = 200;
     if (path.startsWith("/scripts")) {
       const filePath = join(".previous", ...path.split("/").slice(2)); // map URL path to local files
+      console.log(filePath);
+      
       try {
         const fileStat = await stat(filePath);
         if (fileStat.isFile()) {

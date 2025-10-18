@@ -1,10 +1,8 @@
-import React from "react";
-import { hydrateRoot } from "react-dom/client";
+import React from 'react';
+import { hydrateRoot } from 'react-dom/client';
+import { pages } from '../../.pages/index.js';
 
-(async () => {
-  const pathname = window.location.pathname;
+const pathname = window.location.pathname;
+const Page = pages[pathname] || pages['/not-found'];
 
-  const { default: Page } = await import(`/scripts/pages${pathname}.js`);
-
-  hydrateRoot(document.getElementById("root"), React.createElement(Page));
-})();
+hydrateRoot(document.getElementById('root'), React.createElement(Page));
