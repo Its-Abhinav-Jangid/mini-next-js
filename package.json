@@ -3,27 +3,25 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
- "scripts": {
-  "start": "node index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon --exec \"npm run build && node index.js\"",
+    "test": "vitest --run",
+    "build:pages-index": "node generate-pages-index.js",
+    "build:client": "npm run build:pages-index && npx esbuild frontend/static/scripts/client.js --bundle --loader:.js=jsx --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --minify --splitting",
+    "build:ssr": "npx esbuild frontend/pages/*.jsx --loader:.js=jsx --outdir=.previous/pages --format=esm --platform=node --target=esnext --minify --bundle --external:react --external:react-dom",
+    "build": "npm run build:ssr && npm run build:client",
+    "build:client-entry": "npx esbuild frontend/static/scripts/client.js --bundle --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --splitting --minify",
+    "test-build": "npm run build:pages-index && npx esbuild tests/static/scripts/client.js --loader:.js=jsx tests/pages/*.jsx --bundle --outdir=.previous/tests --format=esm --platform=browser --target=esnext --splitting --minify"
 
-  "dev": "nodemon --exec \"npm run build && node index.js\"",
-
-  "test": "vitest --run",
-
-
-  "build:pages-index": "node generate-pages-index.js",
-  "build:client": "npm run build:pages-index && npx esbuild frontend/static/scripts/client.js --bundle --loader:.js=jsx --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --minify --splitting",
-  "build:ssr": "npx esbuild frontend/pages/*.jsx --loader:.js=jsx --outdir=.previous/pages --format=esm --platform=node --target=esnext --minify --bundle --external:react --external:react-dom",
-  "build": "npm run build:ssr && npm run build:client",
-  "build:client-entry": "npx esbuild frontend/static/scripts/client.js --bundle --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --splitting --minify"
-},
-
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@esbuild-kit/esm-loader": "^2.6.5",
+    "axios": "^1.12.2",
     "fs": "^0.0.1-security",
     "http": "^0.0.1-security",
     "path": "^0.12.7",

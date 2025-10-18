@@ -29,7 +29,7 @@ describe("getRoutes function", () => {
 
 describe("Check if server is working", () => {
   let serverProcess;
-  const BASE_URL = "http://localhost:3000";
+  const BASE_URL = "http://localhost:3567";
 
   beforeAll(async () => {
     // Start the dev server

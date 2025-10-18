@@ -149,4 +149,5 @@ if (process.env.NODE_ENV !== "test") {
 } else {
   PUBLIC_DIR = path.join(__dirname, "/tests/static");
   PAGES_FOLDER = path.join(__dirname, "/.previous/tests/pages");
+  PORT = 3567
 }
