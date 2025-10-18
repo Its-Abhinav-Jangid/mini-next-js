@@ -12,7 +12,7 @@
 
 
   "build:pages-index": "node generate-pages-index.js",
-  "build:client": "npm run build:pages-index && npx esbuild frontend/static/scripts/client.js --bundle --loader:.js=jsx --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --minify",
+  "build:client": "npm run build:pages-index && npx esbuild frontend/static/scripts/client.js --bundle --loader:.js=jsx --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --minify --splitting",
   "build:ssr": "npx esbuild frontend/pages/*.jsx --loader:.js=jsx --outdir=.previous/pages --format=esm --platform=node --target=esnext --minify --bundle --external:react --external:react-dom",
   "build": "npm run build:ssr && npm run build:client",
   "build:client-entry": "npx esbuild frontend/static/scripts/client.js --bundle --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --splitting --minify"

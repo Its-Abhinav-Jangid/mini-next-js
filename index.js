@@ -30,6 +30,7 @@ export async function streamReactFileToClient(filePath, response) {
     {
       onShellReady() {
         response.setHeader("content-type", mime[".html"]);
+        response.write("<!DOCTYPE html>")
         pipe(response);
       },
     }
