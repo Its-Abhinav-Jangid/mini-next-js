@@ -1,4 +1,4 @@
-import React from "react";
+import React from "@/frontend/react-runtime.js";
 
 function blog() {
   return <div>blog</div>;

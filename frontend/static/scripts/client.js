@@ -1,8 +1,8 @@
-import React from 'react';
-import { hydrateRoot } from 'react-dom/client';
-import { pages } from '../../.pages/index.js';
+import React from "@/frontend/react-runtime.js";
+import { hydrateRoot } from "@/frontend/react-runtime.js";
+import { pages } from "../../.pages/index.js";
 
 const pathname = window.location.pathname;
-const Page = pages[pathname] || pages['/not-found'];
+const Page = pages[pathname] || pages["/not-found"];
 
-hydrateRoot(document.getElementById('root'), React.createElement(Page));
+hydrateRoot(document.getElementById("root"), React.createElement(Page));

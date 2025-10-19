@@ -3,7 +3,7 @@ import { readdir, readFile, stat } from "fs/promises";
 import path, { extname, join } from "path";
 import { renderToPipeableStream, renderToString } from "react-dom/server";
 import { fileURLToPath, pathToFileURL } from "url";
-import React from "react";
+import React from "./frontend/react-runtime-server.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,13 +24,12 @@ export async function streamReactFileToClient(filePath, response) {
   const file = pathToFileURL(filePath);
   const { default: Component } = await import(file);
   const { default: Layout } = await import("./.previous/pages/layout.js");
-
   const { pipe } = renderToPipeableStream(
     renderWithLayout({ Page: Component, Layout }),
     {
       onShellReady() {
         response.setHeader("content-type", mime[".html"]);
-        response.write("<!DOCTYPE html>")
+        response.write("<!DOCTYPE html>");
         pipe(response);
       },
     }
@@ -71,8 +70,7 @@ export async function startServer(dir = PAGES_FOLDER) {
     res.statusCode = 200;
     if (path.startsWith("/scripts")) {
       const filePath = join(".previous", ...path.split("/").slice(2)); // map URL path to local files
-      console.log(filePath);
-      
+
       try {
         const fileStat = await stat(filePath);
         if (fileStat.isFile()) {
@@ -86,6 +84,17 @@ export async function startServer(dir = PAGES_FOLDER) {
       } catch (err) {
         res.statusCode = 404;
         res.end();
+      }
+    } else if (path.startsWith("/frontend")) {
+      const filePath = join(__dirname, decodeURIComponent(req.url));
+      const fileStat = await stat(filePath);
+      if (fileStat.isFile()) {
+        const content = await readFile(filePath);
+        res.writeHead(200, {
+          "Content-Type": getMimeType(filePath) || "text/plain",
+        });
+        res.end(content);
+        return;
       }
     } else if (path.startsWith("/static")) {
       const filePath = join(PUBLIC_DIR, decodeURIComponent(req.url));
@@ -149,5 +158,5 @@ if (process.env.NODE_ENV !== "test") {
 } else {
   PUBLIC_DIR = path.join(__dirname, "/tests/static");
   PAGES_FOLDER = path.join(__dirname, "/.previous/tests/pages");
-  PORT = 3567
+  PORT = 3567;
 }

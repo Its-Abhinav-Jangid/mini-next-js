@@ -1,5 +1,5 @@
-import React from "react";
-import { hydrateRoot } from "react-dom/client";
+import React from "@/frontend/react-runtime.js"react-runtime.js
+import { hydrateRoot } /scripts/static/scripts/react-runtime.js"-dom/client";
 
 (async () => {
   const pathname = window.location.pathname;

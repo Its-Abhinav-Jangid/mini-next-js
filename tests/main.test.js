@@ -35,11 +35,10 @@ describe("Check if server is working", () => {
     // Start the dev server
     serverProcess = spawn("npm", ["run", "test-build"], {
       shell: true,
-      stdio: "inherit", // output logs to console
+      stdio: "inherit",
     });
-    await delay(5000); // adjust if server takes longer
+    await delay(5000);
     const server = await startServer();
-    // Wait for the server to start
   });
 
   afterAll(() => {

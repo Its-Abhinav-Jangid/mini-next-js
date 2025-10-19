@@ -7,13 +7,11 @@
     "start": "node index.js",
     "dev": "nodemon --exec \"npm run build && node index.js\"",
     "test": "vitest --run",
+    "build": "npm run build:client && npm run build:ssr",
     "build:pages-index": "node generate-pages-index.js",
-    "build:client": "npm run build:pages-index && npx esbuild frontend/static/scripts/client.js --bundle --loader:.js=jsx --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --minify --splitting",
-    "build:ssr": "npx esbuild frontend/pages/*.jsx --loader:.js=jsx --outdir=.previous/pages --format=esm --platform=node --target=esnext --minify --bundle --external:react --external:react-dom",
-    "build": "npm run build:ssr && npm run build:client",
-    "build:client-entry": "npx esbuild frontend/static/scripts/client.js --bundle --outdir=.previous/static/scripts --format=esm --platform=browser --target=esnext --splitting --minify",
-    "test-build": "npm run build:pages-index && npx esbuild tests/static/scripts/client.js --loader:.js=jsx tests/pages/*.jsx --bundle --outdir=.previous/tests --format=esm --platform=browser --target=esnext --splitting --minify"
-
+    "build:client": "node build-client.js && npm run build:pages-index",
+    "build:ssr": "node build-ssr.js",
+    "test-build": "node build-test.js"
   },
   "keywords": [],
   "author": "",
@@ -30,10 +28,15 @@
     "url": "^0.11.4"
   },
   "devDependencies": {
+    "esbuild-plugin-alias-path": "^2.0.2",
     "esbuild-register": "^3.6.0",
     "vitest": "^3.2.4"
   },
   "exports": {
     "@": "./"
+  },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
   }
 }
