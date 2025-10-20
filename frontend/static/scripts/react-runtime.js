@@ -21,14 +21,12 @@ export const {
 } = React;
 
 // Client-side rendering APIs
-export { hydrateRoot, createRoot, flushSync } from "react-dom/client";
+export { hydrateRoot, createRoot } from "react-dom/client";
 
 // Server-side rendering APIs
 export {
   renderToString,
   renderToStaticMarkup,
-  renderToNodeStream,
-  renderToStaticNodeStream,
   renderToPipeableStream,
 } from "react-dom/server";
 

@@ -1,4 +1,4 @@
-import React from "@/frontend/react-runtime.js"react-runtime.js
+import React from "@/.previous/static/scripts/react-runtime-client.js"react-runtime.js
 import { hydrateRoot } /scripts/static/scripts/react-runtime.js"-dom/client";
 
 (async () => {

@@ -1,4 +1,4 @@
-import React from "@/frontend/react-runtime.js";
+import React from "react";
 
 function Layout({ children }) {
   return (

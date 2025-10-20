@@ -1,9 +1,9 @@
 import { createServer } from "http";
 import { readdir, readFile, stat } from "fs/promises";
 import path, { extname, join } from "path";
-import { renderToPipeableStream, renderToString } from "react-dom/server";
+import { renderToPipeableStream } from "react-dom/server";
 import { fileURLToPath, pathToFileURL } from "url";
-import React from "./frontend/react-runtime-server.js";
+import React from "react";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,17 +84,6 @@ export async function startServer(dir = PAGES_FOLDER) {
       } catch (err) {
         res.statusCode = 404;
         res.end();
-      }
-    } else if (path.startsWith("/frontend")) {
-      const filePath = join(__dirname, decodeURIComponent(req.url));
-      const fileStat = await stat(filePath);
-      if (fileStat.isFile()) {
-        const content = await readFile(filePath);
-        res.writeHead(200, {
-          "Content-Type": getMimeType(filePath) || "text/plain",
-        });
-        res.end(content);
-        return;
       }
     } else if (path.startsWith("/static")) {
       const filePath = join(PUBLIC_DIR, decodeURIComponent(req.url));

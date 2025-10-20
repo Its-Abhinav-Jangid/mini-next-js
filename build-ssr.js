@@ -6,7 +6,7 @@ const PAGES_DIR = path.join(OUT_DIR, "pages");
 
 await build({
   entryPoints: ["frontend/static/scripts/react-runtime.js"],
-  outfile: "frontend/react-runtime-server.js",
+  outfile: ".previous/static/scripts/react-runtime-server.js",
   format: "esm",
   platform: "node",
   target: "esnext",
@@ -26,11 +26,19 @@ await build({
     "react",
     "react-dom",
     "react-dom/client",
-    "./frontend/react-runtime.js",
+    "./.previous/static/scripts/react-runtime-client.js",
+    "./.previous/static/scripts/react-runtime-server.js",
   ],
   alias: {
-    "@/frontend/react-runtime.js": path.resolve(
-      "./frontend/react-runtime-server.js"
+    react: path.resolve(".previous/static/scripts/react-runtime-server.js"),
+    "react-dom": path.resolve(
+      ".previous/static/scripts/react-runtime-server.js"
+    ),
+    "react-dom/client": path.resolve(
+      ".previous/static/scripts/react-runtime-server.js"
+    ),
+    "react-dom/server": path.resolve(
+      ".previous/static/scripts/react-runtime-server.js"
     ),
   },
 });

@@ -1,5 +1,5 @@
-import React from "@/frontend/react-runtime.js";
-import { hydrateRoot } from "@/frontend/react-runtime.js";
+import React from "react";
+import { hydrateRoot } from "react-dom/client";
 import { pages } from "../../.pages/index.js";
 
 const pathname = window.location.pathname;

@@ -40,12 +40,11 @@ generatePagesIndex().catch(console.error);
 
 await build({
   entryPoints: ["frontend/static/scripts/react-runtime.js"],
-  outdir: "frontend/",
+  outfile: ".previous/static/scripts/react-runtime-client.js",
   format: "esm",
   platform: "browser",
   target: "esnext",
   bundle: true,
-  splitting: true,
   minify: true,
   alias: {
     "@": path.resolve("."),
@@ -63,13 +62,24 @@ await build({
   minify: true,
   alias: {
     "@": path.resolve("."),
+    react: path.resolve(".previous/static/scripts/react-runtime-client.js"),
+    "react-dom": path.resolve(
+      ".previous/static/scripts/react-runtime-client.js"
+    ),
+    "react-dom/client": path.resolve(
+      ".previous/static/scripts/react-runtime-client.js"
+    ),
   },
-  external: ["react", "react-dom", "./frontend/react-runtime.js"],
+  external: [
+    "react",
+    "react-dom",
+    "./.previous/static/scripts/react-runtime-client.js",
+  ],
 });
 
 await build({
   entryPoints: ["frontend/static/scripts/react-runtime.js"],
-  outfile: "frontend/react-runtime-server.js",
+  outfile: ".previous/static/scripts/react-runtime-server.js",
   format: "esm",
   platform: "node",
   target: "esnext",
@@ -89,11 +99,19 @@ await build({
     "react",
     "react-dom",
     "react-dom/client",
-    "./frontend/react-runtime.js",
+    "./.previous/static/scripts/react-runtime-client.js",
+    "./.previous/static/scripts/react-runtime-server.js",
   ],
   alias: {
-    "@/frontend/react-runtime.js": path.resolve(
-      "./frontend/react-runtime-server.js"
+    react: path.resolve(".previous/static/scripts/react-runtime-server.js"),
+    "react-dom": path.resolve(
+      ".previous/static/scripts/react-runtime-server.js"
+    ),
+    "react-dom/client": path.resolve(
+      ".previous/static/scripts/react-runtime-server.js"
+    ),
+    "react-dom/server": path.resolve(
+      ".previous/static/scripts/react-runtime-server.js"
     ),
   },
 });
