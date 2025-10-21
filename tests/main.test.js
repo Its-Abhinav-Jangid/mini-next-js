@@ -5,6 +5,7 @@ import axios from "axios";
 import { fileURLToPath } from "url";
 import path from "path";
 import { spawn } from "child_process";
+import { generateRoutes } from "generate-routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,12 +18,21 @@ function delay(ms) {
 describe("getRoutes function", () => {
   it("should return routes for '/', '/about', and 404 page", async () => {
     const expected = {
-      "/about": { fileName: "about.js" },
-      "/": { fileName: "index.js" },
-      "/not-found": { fileName: "not-found.js" },
+      "/about": {
+        filePath:
+          "/home/anshu/Coding/mini-next-js/.previous/tests/pages/about/page.js",
+      },
+      "/about/1": {
+        filePath:
+          "/home/anshu/Coding/mini-next-js/.previous/tests/pages/about/1/page.js",
+      },
+      "/": {
+        filePath:
+          "/home/anshu/Coding/mini-next-js/.previous/tests/pages/page.js",
+      },
     };
 
-    const result = await getRoutes();
+    const result = await generateRoutes(path.resolve(".previous/tests/pages"));
     expect(result).toEqual(expected);
   });
 });

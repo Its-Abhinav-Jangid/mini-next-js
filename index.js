@@ -61,7 +61,6 @@ export async function startServer(dir = PAGES_FOLDER) {
   if (dir) PAGES_FOLDER = dir;
 
   const routes = await generateRoutes(PAGES_FOLDER);
-  console.log(routes);
 
   const server = createServer(async (req, res) => {
     const { url } = req;
