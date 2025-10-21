@@ -1,30 +1,31 @@
-import { readdir, writeFile } from 'fs/promises';
-import path from 'path';
+import { readdir, writeFile } from "fs/promises";
+import path from "path";
+import { generateRoutes } from "./generate-routes.js";
 
-const PAGES_DIR = path.resolve('./frontend/pages');
-const OUTPUT_FILE = path.resolve('./frontend/.pages/index.js');
+const PAGES_DIR = path.resolve("./frontend/pages");
+const OUTPUT_FILE = path.resolve("./frontend/.pages/index.js");
 
 async function generatePagesIndex() {
-  const files = await readdir(PAGES_DIR);
+  const routes = await generateRoutes(PAGES_DIR);
+  const keys = Object.keys(routes);
   const imports = [];
   const mapEntries = [];
-
+  let route;
   let counter = 0;
-  for (const file of files) {
-    if (!file.endsWith('.jsx')) continue;
+  for (const key of keys) {
+    route = routes[key];
 
-    const route = file === 'index.jsx' ? '/' : `/${file.replace('.jsx', '')}`;
     const importName = `Page${counter++}`; // safe local variable
 
-    imports.push(`import ${importName} from '../pages/${file}';`);
-    mapEntries.push(`  '${route}': ${importName}`);
+    imports.push(`import ${importName} from '${route.filePath}';`);
+    mapEntries.push(`  '${key}': ${importName}`);
   }
 
   const content = `
-${imports.join('\n')}
+${imports.join("\n")}
 
 export const pages = {
-${mapEntries.join(',\n')}
+${mapEntries.join(",\n")}
 };
 `;
 

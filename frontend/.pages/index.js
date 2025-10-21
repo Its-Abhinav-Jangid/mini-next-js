@@ -1,11 +1,9 @@
-import Page0 from '../pages/about.jsx';
-import Page1 from '../pages/index.jsx';
-import Page2 from '../pages/layout.jsx';
-import Page3 from '../pages/not-found.jsx';
+import Page0 from '/home/anshu/Coding/mini-next-js/frontend/pages/about/page.jsx';
+import Page1 from '/home/anshu/Coding/mini-next-js/frontend/pages/blog/page.jsx';
+import Page2 from '/home/anshu/Coding/mini-next-js/frontend/pages/page.jsx';
 
 export const pages = {
   '/about': Page0,
-  '/': Page1,
-  '/layout': Page2,
-  '/not-found': Page3
+  '/blog': Page1,
+  '/': Page2
 };

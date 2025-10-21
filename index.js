@@ -4,11 +4,12 @@ import path, { extname, join } from "path";
 import { renderToPipeableStream } from "react-dom/server";
 import { fileURLToPath, pathToFileURL } from "url";
 import React from "react";
+import { generateRoutes } from "./generate-routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 let PUBLIC_DIR = path.join(__dirname, "/frontend/static");
-let PORT = 3001;
+let PORT = 3000;
 let PAGES_FOLDER = path.join(__dirname, "/.previous/pages");
 
 const mime = {
@@ -38,19 +39,19 @@ export async function streamReactFileToClient(filePath, response) {
   return pipe;
 }
 
-export async function getRoutes(dir = PAGES_FOLDER) {
-  const files = await readdir(dir);
-  const routes = {};
+// export async function getRoutes(dir = PAGES_FOLDER) {
+//   const files = await readdir(dir);
+//   const routes = {};
 
-  for (const file of files) {
-    if (!file.endsWith(".js")) continue;
-    const name = file.replace(".js", "");
-    if (name === "layout") continue;
-    routes[name === "index" ? "/" : `/${name}`] = { fileName: file };
-  }
+//   for (const file of files) {
+//     if (!file.endsWith(".js")) continue;
+//     const name = file.replace(".js", "");
+//     if (name === "layout") continue;
+//     routes[name === "index" ? "/" : `/${name}`] = { fileName: file };
+//   }
 
-  return routes;
-}
+//   return routes;
+// }
 
 function getMimeType(fileName) {
   return mime[extname(fileName)] || "text/plain";
@@ -59,14 +60,15 @@ function getMimeType(fileName) {
 export async function startServer(dir = PAGES_FOLDER) {
   if (dir) PAGES_FOLDER = dir;
 
-  const routes = await getRoutes(dir);
+  const routes = await generateRoutes(PAGES_FOLDER);
+  console.log(routes);
 
   const server = createServer(async (req, res) => {
     const { url } = req;
     const [path] = url.split("?");
 
     const route = routes[path];
-    const fileName = route?.fileName;
+    const filePath = route?.filePath;
     res.statusCode = 200;
     if (path.startsWith("/scripts")) {
       const filePath = join(".previous", ...path.split("/").slice(2)); // map URL path to local files
@@ -98,15 +100,14 @@ export async function startServer(dir = PAGES_FOLDER) {
       }
     } else {
       try {
-        if (fileName) {
-          const filePath = join(PAGES_FOLDER, fileName);
+        if (filePath) {
           await streamReactFileToClient(filePath, res);
 
           res.end();
         } else {
           res.statusCode = 404;
           if (routes["/not-found"]) {
-            const filePath = join(PAGES_FOLDER, routes["/not-found"].fileName);
+            const filePath = routes["/not-found"].filePath;
 
             await streamReactFileToClient(filePath, res);
 

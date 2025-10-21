@@ -9,7 +9,7 @@
     "test": "vitest --run",
     "build": "npm run build:client && npm run build:ssr",
     "build:pages-index": "node generate-pages-index.js",
-    "build:client": "node build-client.js && npm run build:pages-index",
+    "build:client": "npm run build:pages-index && node build-client.js",
     "build:ssr": "node build-ssr.js",
     "test-build": "node build-test.js"
   },
@@ -21,6 +21,7 @@
     "@esbuild-kit/esm-loader": "^2.6.5",
     "axios": "^1.12.2",
     "fs": "^0.0.1-security",
+    "glob": "^11.0.3",
     "http": "^0.0.1-security",
     "path": "^0.12.7",
     "react": "^19.2.0",
