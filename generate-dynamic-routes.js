@@ -1,7 +1,7 @@
 import { readdir } from "fs/promises";
 import path from "path";
 
-export async function generateRoutes(PAGES_DIR) {
+export async function generateDynamicRoutes(PAGES_DIR) {
   let isRoot = true;
   async function helper(folderPath) {
     const folderEntries = await readdir(folderPath, { withFileTypes: true });
@@ -30,7 +30,3 @@ export async function generateRoutes(PAGES_DIR) {
 
   return await helper(PAGES_DIR);
 }
-
-console.log(
-  JSON.stringify(await generateRoutes(path.resolve("frontend/pages")), null, 2)
-);

@@ -1,10 +1,10 @@
 import { createServer } from "http";
-import { readdir, readFile, stat } from "fs/promises";
+import { readFile, stat } from "fs/promises";
 import path, { extname, join } from "path";
 import { renderToPipeableStream } from "react-dom/server";
 import { fileURLToPath, pathToFileURL } from "url";
 import React from "react";
-import { generateRoutes } from "./generate-routes.js";
+import { generateDynamicRoutes } from "./generate-dynamic-routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,18 +56,44 @@ export async function streamReactFileToClient(filePath, response) {
 function getMimeType(fileName) {
   return mime[extname(fileName)] || "text/plain";
 }
+function resolveRoute({ allRoutesTree, pathname }) {
+  console.log(pathname);
+
+  const folders = pathname.split("/");
+
+  let currentRoute = allRoutesTree;
+
+  for (const folder of folders.slice(1)) {
+    if (folder.length === 0) continue;
+    const route = currentRoute.children.find((child) => child.name === folder);
+    if (!route) {
+      return;
+    }
+    currentRoute = route;
+  }
+
+  return currentRoute;
+}
+
+// console.log(
+// resolveRoute({
+// allRoutesTree:
+// await generateDynamicRoutes(PUBLIC_DIR)
+// pathname: "/scripts/client.js",
+// })
+// );
 
 export async function startServer(dir = PAGES_FOLDER) {
   if (dir) PAGES_FOLDER = dir;
 
-  const routes = await generateRoutes(PAGES_FOLDER);
+  const routes = await generateDynamicRoutes(PAGES_FOLDER);
 
   const server = createServer(async (req, res) => {
     const { url } = req;
     const [path] = url.split("?");
 
-    const route = routes[path];
-    const filePath = route?.filePath;
+    const route = resolveRoute({ allRoutesTree: routes, pathname: path });
+    const filePath = route?.page;
     res.statusCode = 200;
     if (path.startsWith("/scripts")) {
       const filePath = join(".previous", ...path.split("/").slice(2)); // map URL path to local files
@@ -87,15 +113,20 @@ export async function startServer(dir = PAGES_FOLDER) {
         res.end();
       }
     } else if (path.startsWith("/static")) {
-      const filePath = join(PUBLIC_DIR, decodeURIComponent(req.url));
-      const fileStat = await stat(filePath);
-      if (fileStat.isFile()) {
-        const content = await readFile(filePath);
-        res.writeHead(200, {
-          "Content-Type": getMimeType(filePath) || "text/plain",
-        });
-        res.end(content);
-        return;
+      try {
+        const filePath = join(PUBLIC_DIR, decodeURIComponent(req.url));
+        const fileStat = await stat(filePath);
+        if (fileStat.isFile()) {
+          const content = await readFile(filePath);
+          res.writeHead(200, {
+            "Content-Type": getMimeType(filePath) || "text/plain",
+          });
+          res.end(content);
+          return;
+        }
+      } catch (err) {
+        res.statusCode = 404;
+        res.end();
       }
     } else {
       try {
