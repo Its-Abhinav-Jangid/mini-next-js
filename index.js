@@ -56,6 +56,24 @@ export async function streamReactFileToClient(filePath, response) {
 function getMimeType(fileName) {
   return mime[extname(fileName)] || "text/plain";
 }
+
+function isPathInsideRoot(filePath, rootPath) {
+  const resolvedFilePath = path.resolve(filePath);
+  const resolvedRootPath = path.resolve(rootPath);
+  const rootWithSeparator = resolvedRootPath.endsWith(path.sep)
+    ? resolvedRootPath
+    : `${resolvedRootPath}${path.sep}`;
+
+  return (
+    resolvedFilePath === resolvedRootPath ||
+    resolvedFilePath.startsWith(rootWithSeparator)
+  );
+}
+
+function isAllowedByWhitelist(filePath, whitelistRoots) {
+  return whitelistRoots.some((rootPath) => isPathInsideRoot(filePath, rootPath));
+}
+
 function resolveRoute({ allRoutesTree, pathname }) {
   console.log(pathname);
 
@@ -87,16 +105,28 @@ export async function startServer(dir = PAGES_FOLDER) {
   if (dir) PAGES_FOLDER = dir;
 
   const routes = await generateDynamicRoutes(PAGES_FOLDER);
+  const whitelistRoots = [
+    path.resolve(PAGES_FOLDER),
+    path.resolve(PUBLIC_DIR),
+    path.resolve(".previous"),
+  ];
 
   const server = createServer(async (req, res) => {
     const { url } = req;
-    const [path] = url.split("?");
+    const [pathname] = url.split("?");
 
-    const route = resolveRoute({ allRoutesTree: routes, pathname: path });
+    const route = resolveRoute({ allRoutesTree: routes, pathname });
     const filePath = route?.page;
     res.statusCode = 200;
-    if (path.startsWith("/scripts")) {
-      const filePath = join(".previous", ...path.split("/").slice(2)); // map URL path to local files
+    if (pathname.startsWith("/scripts")) {
+      const filePath = path.resolve(
+        join(".previous", ...pathname.split("/").slice(2))
+      ); // map URL path to local files
+      if (!isAllowedByWhitelist(filePath, whitelistRoots)) {
+        res.statusCode = 403;
+        res.end("<h1>Forbidden</h1>");
+        return;
+      }
 
       try {
         const fileStat = await stat(filePath);
@@ -112,9 +142,16 @@ export async function startServer(dir = PAGES_FOLDER) {
         res.statusCode = 404;
         res.end();
       }
-    } else if (path.startsWith("/static")) {
+    } else if (pathname.startsWith("/static")) {
       try {
-        const filePath = join(PUBLIC_DIR, decodeURIComponent(req.url));
+        const filePath = path.resolve(
+          join(PUBLIC_DIR, decodeURIComponent(pathname))
+        );
+        if (!isAllowedByWhitelist(filePath, whitelistRoots)) {
+          res.statusCode = 403;
+          res.end("<h1>Forbidden</h1>");
+          return;
+        }
         const fileStat = await stat(filePath);
         if (fileStat.isFile()) {
           const content = await readFile(filePath);
@@ -131,6 +168,11 @@ export async function startServer(dir = PAGES_FOLDER) {
     } else {
       try {
         if (filePath) {
+          if (!isAllowedByWhitelist(filePath, whitelistRoots)) {
+            res.statusCode = 403;
+            res.end("<h1>Forbidden</h1>");
+            return;
+          }
           await streamReactFileToClient(filePath, res);
 
           res.end();
