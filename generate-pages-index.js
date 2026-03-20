@@ -4,6 +4,12 @@ import { generateRoutes } from "./generate-routes.js";
 
 const PAGES_DIR = path.resolve("./frontend/pages");
 const OUTPUT_FILE = path.resolve("./frontend/.pages/index.js");
+const OUTPUT_DIR = path.dirname(OUTPUT_FILE);
+
+function toModuleSpecifier(fromDir, targetFile) {
+  const relativePath = path.relative(fromDir, targetFile).replace(/\\/g, "/");
+  return relativePath.startsWith(".") ? relativePath : `./${relativePath}`;
+}
 
 async function generatePagesIndex() {
   const routes = await generateRoutes(PAGES_DIR);
@@ -17,7 +23,8 @@ async function generatePagesIndex() {
 
     const importName = `Page${counter++}`; // safe local variable
 
-    imports.push(`import ${importName} from '${route.filePath}';`);
+    const moduleSpecifier = toModuleSpecifier(OUTPUT_DIR, route.filePath);
+    imports.push(`import ${importName} from '${moduleSpecifier}';`);
     mapEntries.push(`  '${key}': ${importName}`);
   }
 
